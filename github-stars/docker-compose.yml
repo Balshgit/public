@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+
+version: "3.7"
+
+services:
+  db:
+    image: "postgres:12"
+    container_name: github_db
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - webnet
+    env_file: ./config/.env
+    ports:
+      - 5433:5432
+
+  rabbitmq:
+    hostname: rabbitmq_host
+    image: 'rabbitmq:3.8.18-management-alpine'
+    container_name: github_rabbit
+    env_file: config/.env
+    restart: unless-stopped
+    networks:
+      - webnet
+    ports:
+      - 8080:15672
+      - 5672:5672
+
+  web:
+    image: "github-repos"
+    container_name: github_web
+    build:
+      context: .
+      dockerfile: ./docker/django/Dockerfile
+#      args:
+#        DJANGO_ENV: development
+#      cache_from:
+#        - "github-repos:dev"
+#        - "github-repos:latest"
+#        - "*"
+#      volumes:
+#        - django-static:/var/www/django/static
+    restart: unless-stopped
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    networks:
+      - webnet
+    env_file: ./config/.env
+    command: >
+      bash -c "python manage.py makemigrations
+      && python manage.py migrate
+      && python manage.py compilemessages
+      && python manage.py create_superuser
+      && python -Wd manage.py runserver 0.0.0.0:8000"
+#    healthcheck:
+#      # We use `$$` here because:
+#      # one `$` goes to shell,
+#      # one `$` goes to `docker-compose.yml` escaping
+#      test: |
+#        /usr/bin/test $$(
+#          /usr/bin/curl --fail http://localhost:8000/health/?format=json
+#          --write-out "%{http_code}" --silent --output /dev/null
+#        ) -eq 200
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+#      start_period: 30s
+
+  worker:
+    container_name: github_celery_worker
+    image: "github-repos"
+    command: celery --app=server.apps.main.commands:celery_app worker --loglevel=INFO
+    env_file: config/.env
+    depends_on:
+      - rabbitmq
+      - web
+    restart: unless-stopped
+    networks:
+      - webnet
+
+  flower:
+    container_name: github_celery_flower
+    image: "github-repos"
+    command: celery --app=server.apps.main.commands:celery_app flower --loglevel=INFO
+    env_file: config/.env
+    depends_on:
+      - rabbitmq
+      - web
+    restart: unless-stopped
+    ports:
+      - 5555:5555
+    networks:
+      - webnet
+
+
+
+# This task is an example of how to extend existing ones:
+#   some_worker:
+#     <<: *web
+#     command: python manage.py worker_process
+
+networks:
+  # Network for your internals, use it by default:
+  webnet:
+    name:
+      github_network
+
+volumes:
+  pgdata:
+    name: github_pgdata

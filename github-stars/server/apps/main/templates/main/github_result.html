@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Github results</title>
+</head>
+<body>
+  {{ message }}
+      {% for repo, stars in data.items %}
+      <br>
+      {{ repo }} {{ stars }}
+      {% endfor %}
+</body>
+</html>

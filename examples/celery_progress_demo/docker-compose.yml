@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+version: "3.7"
+
+services:
+
+  rabbitmq:
+    image: 'rabbitmq:3.8.18-management-alpine'
+    container_name: github_rabbit
+    env_file: config/.env
+    restart: unless-stopped
+    network_mode: host
