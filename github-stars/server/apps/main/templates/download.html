@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block demo %}
+<!-- Reset Form -->
+<div class="container text-center" style="padding-top: 20px;">
+<form action="{% url 'demo' %}" method="GET" style="display: inline;">
+  {% csrf_token %}
+  <button class="btn btn-primary" type="submit" style="width:120px; background-color:#23e841; color:black">
+    <strong>REFRESH PAGE</strong>
+  </button>
+</form>
+</div>
+
+<!-- Download Form -->
+<div class="container text-center" style="padding-top: 20px;">
+    <form action="{% url 'demo' %}" method="post" style="display: inline;">
+      {% csrf_token %}
+        <dl class="register">
+        {% for field in form %}
+         <dt>{{ field.label_tag }}</dt>
+          <dd class="clearfix">{{ field }}
+            {% if field.help_text %}<div class="clearfix">{{ field.help_text }}</div>{% endif %}
+            {% if field.errors %}<div class="myerrors clearfix">{{ field.errors }}</div>{% endif %}
+          </dd>
+        {% endfor %}
+      </dl>
+        <button class="btn btn-primary" type="submit" style="width:120px; background-color:#23e841; color:black;">
+            <strong>Get Github stars</strong>
+        </button>
+    </form>
+</div>
+
+<!-- Download Status -->
+<div class="container" style="padding-top: 20px;">
+    <div class="card" style="height: 120px;">
+        {% block progress %}{% endblock progress %}
+    </div>
+</div>
+{% endblock %}
