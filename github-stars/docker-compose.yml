@@ -2,6 +2,16 @@
 
 version: "3.7"
 
+networks:
+  # Network for your internals, use it by default:
+  webnet:
+    name:
+      github_network
+
+volumes:
+  pgdata:
+    name: github_pgdata
+
 services:
   db:
     image: "postgres:12"
@@ -35,10 +45,9 @@ services:
       dockerfile: ./docker/django/Dockerfile
 #      args:
 #        DJANGO_ENV: development
-#      cache_from:
-#        - "github-repos:dev"
-#        - "github-repos:latest"
-#        - "*"
+      cache_from:
+        - "github-repos:dev"
+        - "github-repos:latest"
 #      volumes:
 #        - django-static:/var/www/django/static
     restart: unless-stopped
@@ -97,19 +106,7 @@ services:
     networks:
       - webnet
 
-
-
 # This task is an example of how to extend existing ones:
 #   some_worker:
 #     <<: *web
 #     command: python manage.py worker_process
-
-networks:
-  # Network for your internals, use it by default:
-  webnet:
-    name:
-      github_network
-
-volumes:
-  pgdata:
-    name: github_pgdata
