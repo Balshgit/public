@@ -1,4 +1,4 @@
-FROM python:3.8.9-slim-buster
+FROM python:3.9.7-slim-buster
 
 ENV BUILD_ONLY_PACKAGES='wget' \
   # python:
@@ -11,7 +11,7 @@ ENV BUILD_ONLY_PACKAGES='wget' \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100 \
   # poetry:
-  POETRY_VERSION=1.1.4 \
+  POETRY_VERSION=1.1.11 \
   POETRY_NO_INTERACTION=1 \
   POETRY_VIRTUALENVS_CREATE=false \
   POETRY_CACHE_DIR='/var/cache/pypoetry' \

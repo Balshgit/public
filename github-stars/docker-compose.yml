@@ -13,7 +13,7 @@ services:
       - webnet
     env_file: ./config/.env
     ports:
-      - 5433:5432
+      - "5433:5432"
 
   rabbitmq:
     hostname: rabbitmq_host
@@ -24,8 +24,8 @@ services:
     networks:
       - webnet
     ports:
-      - 8080:15672
-      - 5672:5672
+      - "8080:15672"
+      - "5672:5672"
 
   web:
     image: "github-repos"
@@ -45,7 +45,7 @@ services:
     volumes:
       - .:/code
     ports:
-      - 8000:8000
+      - "8000:8000"
     depends_on:
       - db
     networks:
@@ -93,7 +93,7 @@ services:
       - web
     restart: unless-stopped
     ports:
-      - 5555:5555
+      - "5555:5555"
     networks:
       - webnet
 

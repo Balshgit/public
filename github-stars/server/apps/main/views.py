@@ -1,13 +1,14 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from .forms import GithubForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from .commands import get_github_stars, process_download
+from .commands import get_github_stars, console_logger, process_download
 from django.views.decorators.http import require_http_methods
 from celery.result import AsyncResult
+from functools import lru_cache
 
 
 task_id = {}
@@ -29,10 +30,9 @@ def github(request: HttpRequest) -> HttpResponse:
     try:
         email = getattr((User.objects.get(username=username)),
                         'email', 'default@email.ru')
-
     except ObjectDoesNotExist as e:
         error = 'That user doesnt exists or not log on'
-        print(error, e)
+        console_logger.error(error, e)
 
     if request.method == 'POST':
 
@@ -40,7 +40,7 @@ def github(request: HttpRequest) -> HttpResponse:
         result = get_github_stars.delay(github_username)
         task_id[username] = result.task_id
 
-        return redirect(reverse('github_result'))
+        return redirect(reverse_lazy('github_result'))
 
     form = GithubForm
     return render(request, 'main/github.html',
@@ -53,18 +53,21 @@ def github_result(request: HttpRequest) -> HttpResponse:
     username = str(request.user.username)
     data = AsyncResult(task_id[username])
 
+    result = {}
+    message = ''
     if data.ready():
         message = "Result Ready"
         result = data.get()
-        print('result ready')
+        console_logger.info('result ready')
     else:
-        print('result not ready')
+        console_logger.info('result not ready')
 
     return render(request, 'main/github_result.html',
                   context={'data': result,
                            'message': message})
 
 
+@lru_cache(maxsize=10)
 def demo_view(request: HttpRequest) -> HttpResponse:
     username = str(request.user.username)
     form = GithubForm
@@ -79,11 +82,11 @@ def demo_view(request: HttpRequest) -> HttpResponse:
                 message = f'Total repos: {len(result)}\n'
                 if len(result) == 0:
                     result = {'Error': 'User has no repositories!'}
-                print('Result ready! Please refresh page')
+                console_logger.info('Result ready! Please refresh page')
             else:
-                print('result not ready')
+                console_logger.info('result not ready')
         except KeyError as e:
-            print(e)
+            console_logger.error(e)
         finally:
             # Return demo view
             return render(request, 'progress.html',
@@ -99,7 +102,7 @@ def demo_view(request: HttpRequest) -> HttpResponse:
         # Get ID
         task_id[username] = result.task_id
         # Print Task ID
-        print(f'Celery Task ID: {task_id[username]}')
+        console_logger.info(f'Celery Task ID: {task_id[username]}')
         # Return demo view with Task ID
         return render(request, 'progress.html',
                       context={'task_id': task_id[username],
