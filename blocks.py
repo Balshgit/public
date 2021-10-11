@@ -93,12 +93,12 @@ class BlockSearcher:
 
     # count unique items in doubled array
     def blocks_count(self) -> int:
-        maximum = set()
+        elements = set()
         for row in range(self.height):
             for elem in self.array_copy[row]:
-                maximum.add(elem)
-        maximum.remove(0)
-        return len(maximum)
+                elements.add(elem)
+        elements.remove(0)
+        return len(elements)
 
     # print both arrays for debug
     def print(self) -> None:
