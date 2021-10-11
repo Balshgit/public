@@ -9,8 +9,8 @@ LIST_WIDTH = 7
 def list_generator() -> None:
     test_list = [[randint(0, 1) for _ in range(LIST_WIDTH)] for _ in range(LIST_HEIGHT)]
     print('arr = [\n', end='')
-    for i in range(LIST_HEIGHT):
-        print(f'{test_list[i]},')
+    for row in range(LIST_HEIGHT):
+        print(f'{test_list[row]},')
     print(']')
 
 # list_generator()
