@@ -60,7 +60,7 @@ class BlockSearcher:
             self.array_copy[row][column] = element
 
     # check each element if it the same as all elements around him
-    def touch(self, row: int, column: int) -> None:
+    def morf_to_neighbor_element(self, row: int, column: int) -> None:
         if self.array[row][column] == 1:
             element = self.array_copy[row][column]
             for row_index in range(-1, 2):
@@ -74,15 +74,6 @@ class BlockSearcher:
                         if temp_element != 0 and temp_element != element:
                             self.changer(self.array_copy, element, temp_element)
 
-    # filter doubled array
-    def filter(self) -> None:
-        for row in range(self.height):
-            for column in range(self.width):
-                self.search(row, column)
-        for row in range(self.height):
-            for column in range(self.width):
-                self.touch(row, column)
-
     # change doubled values
     def changer(self, array: list, element: str, insert: str) -> list:
         for row in range(self.height):
@@ -90,6 +81,16 @@ class BlockSearcher:
                 if array[row][column] == element:
                     array[row][column] = insert
         return array
+
+    def analyze(self) -> None:
+        # Create new array
+        for row in range(self.height):
+            for column in range(self.width):
+                self.search(row, column)
+        # Remove doubles from it
+        for row in range(self.height):
+            for column in range(self.width):
+                self.morf_to_neighbor_element(row, column)
 
     # count unique items in doubled array
     def blocks_count(self) -> int:
@@ -107,6 +108,6 @@ class BlockSearcher:
 
 
 bs = BlockSearcher(arr)
-bs.filter()
+bs.analyze()
 # bs.print()  # use for DEBUG
 print(f'Total blocks: {bs.blocks_count()}')
