@@ -2,8 +2,8 @@ import copy
 from random import randint
 from typing import Union
 
-LIST_HEIGHT = 9
-LIST_WIDTH = 6
+LIST_HEIGHT = 100
+LIST_WIDTH = 100
 
 
 # List generator for check
@@ -37,7 +37,7 @@ class BlockSearcher:
         self.height = len(array)
         self.block_number = 0
 
-    def exists(self, row: int, column: int) -> int:
+    def _exists(self, row: int, column: int) -> int:
         if self.array[row][column] == 1:
             for row_index in range(-1, 1):
                 columns = range(-1, 1) if row_index == 0 else range(-1, 2)
@@ -52,8 +52,8 @@ class BlockSearcher:
                             return element
 
     # add number to the element if it exists
-    def search(self, row: int, column: int) -> None:
-        element = self.exists(row, column)
+    def _search(self, row: int, column: int) -> None:
+        element = self._exists(row, column)
         if self.array[row][column] == 1 and not element:
             self.block_number += 1
             self.array_copy[row][column] = f'1{self.block_number}'
@@ -61,7 +61,7 @@ class BlockSearcher:
             self.array_copy[row][column] = element
 
     # check each element if it the same as all elements around him
-    def morf_to_neighbor_element(self, row: int, column: int) -> None:
+    def _morf_to_neighbor_element(self, row: int, column: int) -> None:
         if self.array[row][column] == 1:
             element = self.array_copy[row][column]
             for row_index in range(-1, 2):
@@ -87,11 +87,11 @@ class BlockSearcher:
         # Create new array
         for row in range(self.height):
             for column in range(self.width):
-                self.search(row, column)
+                self._search(row, column)
         # Remove doubles from it
         for row in range(self.height):
             for column in range(self.width):
-                self.morf_to_neighbor_element(row, column)
+                self._morf_to_neighbor_element(row, column)
 
     # count unique items in doubled array
     def blocks_count(self) -> int:

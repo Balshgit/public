@@ -115,7 +115,6 @@ array = [[1, 0, 1, 0, 1, 0],
          [0, 1, 0, 1, 0, 0],
          ]
 
-
 n_i = len(array)
 n_j = len(array[0])
 count = 0
