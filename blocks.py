@@ -1,8 +1,9 @@
 import copy
 from random import randint
+from typing import Union
 
-LIST_HEIGHT = 8
-LIST_WIDTH = 7
+LIST_HEIGHT = 9
+LIST_WIDTH = 6
 
 
 # List generator for check
@@ -13,8 +14,8 @@ def list_generator() -> None:
         print(f'{test_list[row]},')
     print(']')
 
-# list_generator()
 
+# list_generator()
 
 arr = [
  #   0  1  2  3  4  5  6
@@ -75,7 +76,7 @@ class BlockSearcher:
                             self.changer(self.array_copy, element, temp_element)
 
     # change doubled values
-    def changer(self, array: list, element: str, insert: str) -> list:
+    def changer(self, array: list, element: Union[str, int], insert: str) -> list:
         for row in range(self.height):
             for column in range(self.width):
                 if array[row][column] == element:
@@ -104,10 +105,14 @@ class BlockSearcher:
     # print both arrays for debug
     def print(self) -> None:
         for row in range(self.height):
-            print(self.array[row], self.array_copy[row])
+            print(self.array[row], ' <|> ', self.array_copy[row])
 
 
 bs = BlockSearcher(arr)
 bs.analyze()
-# bs.print()  # use for DEBUG
-print(f'Total blocks: {bs.blocks_count()}')
+blocks_count = bs.blocks_count()
+print(f'Total blocks: {blocks_count}')
+
+# ------ use for DEBUG -------
+bs.changer(bs.array_copy, 0, '00')
+bs.print()
