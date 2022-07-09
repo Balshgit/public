@@ -12,7 +12,7 @@ from typing import Dict, List, Tuple, Union
 
 DEBUG = True
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from server.settings.components import BASE_DIR, config
 
